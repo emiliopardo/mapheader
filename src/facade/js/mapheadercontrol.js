@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * @module M/control/MapheaderControl
  */
@@ -15,7 +16,7 @@ export default class MapheaderControl extends M.Control {
    * @extends {M.Control}
    * @api stable
    */
-  constructor() {
+  constructor(config) {
     // 1. checks if the implementation can create PluginControl
     if (M.utils.isUndefined(MapheaderImplControl)) {
       M.exception('La implementación usada no puede crear controles MapheaderControl');
@@ -24,10 +25,14 @@ export default class MapheaderControl extends M.Control {
     const impl = new MapheaderImplControl();
     super(impl, 'Mapheader');
 
-    // captura de customevent lanzado desde impl con coords
-    window.addEventListener('mapclicked', (e) => {
-      this.map_.addLabel('Hola Mundo!', e.detail);
-    });
+
+    this.config = config;
+    this.htmlCode = this.config.htmlCode
+    this.cssList = this.config.cssList
+    this.injectCSS(this.cssList)
+    this.templateVars = { vars: { htmlCode: this.htmlCode } };
+
+
   }
 
   /**
@@ -39,32 +44,15 @@ export default class MapheaderControl extends M.Control {
    * @api stable
    */
   createView(map) {
-    if (!M.template.compileSync) { // JGL: retrocompatibilidad Mapea4
-      M.template.compileSync = (string, options) => {
-        let templateCompiled;
-        let templateVars = {};
-        let parseToHtml;
-        if (!M.utils.isUndefined(options)) {
-          templateVars = M.utils.extends(templateVars, options.vars);
-          parseToHtml = options.parseToHtml;
-        }
-        const templateFn = Handlebars.compile(string);
-        const htmlText = templateFn(templateVars);
-        if (parseToHtml !== false) {
-          templateCompiled = M.utils.stringToHtml(htmlText);
-        } else {
-          templateCompiled = htmlText;
-        }
-        return templateCompiled;
-      };
-    }
-    
     return new Promise((success, fail) => {
-      const html = M.template.compileSync(template);
-      // Añadir código dependiente del DOM
+      const html = M.template.compileSync(template, this.templateVars);
+      // Añadir código dependiente del DOM     
+
+      this.addEvents();
       success(html);
     });
   }
+
 
   /**
    * This function is called on the control activation
@@ -76,13 +64,6 @@ export default class MapheaderControl extends M.Control {
   activate() {
     // calls super to manage de/activation
     super.activate();
-    const div = document.createElement('div');
-    div.id = 'msgInfo';
-    div.classList.add('info');
-    div.innerHTML = 'Haz doble click sobre el mapa';
-    this.map_.getContainer().appendChild(div);
-
-    this.getImpl().activateClick(this.map_);
   }
   /**
    * This function is called on the control deactivation
@@ -94,10 +75,6 @@ export default class MapheaderControl extends M.Control {
   deactivate() {
     // calls super to manage de/activation
     super.deactivate();
-    const div = document.getElementById('msgInfo');
-    this.map_.getContainer().removeChild(div);
-
-    this.getImpl().deactivateClick(this.map_);
   }
   /**
    * This function gets activation button
@@ -124,4 +101,112 @@ export default class MapheaderControl extends M.Control {
   }
 
   // Add your own functions
+  injectCSS(cssList) {
+    for (let index = 0; index < cssList.length; index++) {
+      const cssFile = cssList[index];
+      let link = document.createElement("link");
+      link.href = cssFile;
+      //link.type = "text/css";
+      link.rel = "stylesheet";
+      link.addEventListener('load', () => {
+        // console.log('se cargo el enlace: ' + cssList[index])
+        this.checkHeaderheight()
+        // console.log(this.panelHeight)
+      })
+      link.media = "screen";
+      document.getElementsByTagName("head")[0].appendChild(link);
+    }
+  }
+
+  addEvents(html) {
+    this.panelHeight = this.checkHeaderheight(html);
+    // Selectores de Elementos
+    let btnMapHeaderClosed = document.querySelectorAll('button.m-panel-btn.g-cartografia-flecha-abajo')[0];
+    let btnMapHeaderOpened = document.querySelectorAll('button.m-panel-btn.g-cartografia-flecha-derecha')[0];
+      
+    
+
+    btnMapHeaderOpened.title = 'Ocultar cabecera de página';
+    btnMapHeaderClosed.title = 'Ocultar cabecera de página';
+    // EventListener
+    btnMapHeaderClosed.addEventListener('click', () => {
+      let btnMapHeaderOpened = document.querySelectorAll('button.m-panel-btn.g-cartografia-flecha-derecha')[0]
+      if (event.target.parentElement.classList.contains('opened')) {
+        btnMapHeaderOpened.title = 'Ocultar cabecera de página';
+        btnMapHeaderClosed.title = 'Ocultar cabecera de página';
+        this.opened = true;
+        this.checkHeaderheight(html);
+        this.setTopMargin(this.opened);       
+      } else {
+        btnMapHeaderOpened.title = 'Mostrar cabecera de página';
+        btnMapHeaderClosed.title = 'Mostrar cabecera de página';
+        this.opened = false;       
+        this.checkHeaderheight(html);
+        this.setTopMargin(this.opened);        
+       
+      }
+    });
+    
+
+  }
+
+  checkHeaderheight() {
+    let bottomElements = document.querySelectorAll('div.m-top');
+    if (document.querySelectorAll('div.m-panel.m-mapheader').length > 0) {
+      this.panelHeight = document.querySelectorAll('div.m-panel.m-mapheader')[0].clientHeight;
+    }
+    //this.panelHeight = this.html_.offsetHeight;      
+    for (let index = 0; index < bottomElements.length; index++) {
+      const element = bottomElements[index];
+      if (element.classList.contains('m-left')) {
+        element.style.marginTop = this.panelHeight + 30 + "px";
+      }
+    }
+    bottomElements = document.querySelectorAll('div.m-top.m-right')[0].childNodes; 
+
+    for (let index = 0; index < bottomElements.length; index++) {
+      const element = bottomElements[index];
+      if (!element.classList.contains('m-mapheader')) {
+
+       element.style.setProperty('margin-top',this.panelHeight + 10 +'px','important');
+       
+      }
+    }
+  }
+
+  setTopMargin(opened) {
+    let bottomElements = document.querySelectorAll('div.m-top');
+    
+    for (let index = 0; index < bottomElements.length; index++) {
+      const element = bottomElements[index];
+      if (element.classList.contains('m-left')) {
+        if (opened) {
+          element.style.marginTop = this.panelHeight + 30 + "px";
+        } else {
+          element.style.marginTop = 30 + "px";
+        }
+      }
+    }
+    //bottomElements = document.querySelectorAll('div.m-top.m-right');
+    bottomElements = document.querySelectorAll('div.m-top.m-right')[0].childNodes;
+    for (let index = 0; index < bottomElements.length; index++) {
+      const element = bottomElements[index];      
+
+      if (!element.classList.contains('m-mapheader')) {
+                
+        if (opened) {
+          
+          element.style.setProperty('margin-top',this.panelHeight + 10 +'px','important'); 
+          document.getElementById('div-contenedor').style.display='block';         
+          
+        } else {
+          element.style.setProperty('margin-top', 10 +'px','important');
+          document.getElementById('div-contenedor').style.display='none';
+
+          
+        }
+      }
+     
+    }
+  }
 }
