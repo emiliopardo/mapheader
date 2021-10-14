@@ -106,12 +106,9 @@ export default class MapheaderControl extends M.Control {
       const cssFile = cssList[index];
       let link = document.createElement("link");
       link.href = cssFile;
-      //link.type = "text/css";
       link.rel = "stylesheet";
       link.addEventListener('load', () => {
-        // console.log('se cargo el enlace: ' + cssList[index])
         this.checkHeaderheight()
-        // console.log(this.panelHeight)
       })
       link.media = "screen";
       document.getElementsByTagName("head")[0].appendChild(link);
@@ -123,8 +120,6 @@ export default class MapheaderControl extends M.Control {
     // Selectores de Elementos
     let btnMapHeaderClosed = document.querySelectorAll('button.m-panel-btn.g-cartografia-flecha-abajo')[0];
     let btnMapHeaderOpened = document.querySelectorAll('button.m-panel-btn.g-cartografia-flecha-derecha')[0];
-      
-    
 
     btnMapHeaderOpened.title = 'Ocultar cabecera de página';
     btnMapHeaderClosed.title = 'Ocultar cabecera de página';
@@ -136,47 +131,40 @@ export default class MapheaderControl extends M.Control {
         btnMapHeaderClosed.title = 'Ocultar cabecera de página';
         this.opened = true;
         this.checkHeaderheight(html);
-        this.setTopMargin(this.opened);       
+        this.setTopMargin(this.opened);
       } else {
         btnMapHeaderOpened.title = 'Mostrar cabecera de página';
         btnMapHeaderClosed.title = 'Mostrar cabecera de página';
-        this.opened = false;       
+        this.opened = false;
         this.checkHeaderheight(html);
-        this.setTopMargin(this.opened);        
-       
+        this.setTopMargin(this.opened);
       }
     });
-    
-
   }
 
   checkHeaderheight() {
     let bottomElements = document.querySelectorAll('div.m-top');
     if (document.querySelectorAll('div.m-panel.m-mapheader').length > 0) {
       this.panelHeight = document.querySelectorAll('div.m-panel.m-mapheader')[0].clientHeight;
-    }
-    //this.panelHeight = this.html_.offsetHeight;      
+    } 
     for (let index = 0; index < bottomElements.length; index++) {
       const element = bottomElements[index];
       if (element.classList.contains('m-left')) {
         element.style.marginTop = this.panelHeight + 30 + "px";
       }
     }
-    bottomElements = document.querySelectorAll('div.m-top.m-right')[0].childNodes; 
+    bottomElements = document.querySelectorAll('div.m-top.m-right')[0].childNodes;
 
     for (let index = 0; index < bottomElements.length; index++) {
       const element = bottomElements[index];
       if (!element.classList.contains('m-mapheader')) {
-
-       element.style.setProperty('margin-top',this.panelHeight + 10 +'px','important');
-       
+        element.style.setProperty('margin-top', this.panelHeight + 10 + 'px', 'important');
       }
     }
   }
 
   setTopMargin(opened) {
     let bottomElements = document.querySelectorAll('div.m-top');
-    
     for (let index = 0; index < bottomElements.length; index++) {
       const element = bottomElements[index];
       if (element.classList.contains('m-left')) {
@@ -187,26 +175,22 @@ export default class MapheaderControl extends M.Control {
         }
       }
     }
-    //bottomElements = document.querySelectorAll('div.m-top.m-right');
     bottomElements = document.querySelectorAll('div.m-top.m-right')[0].childNodes;
     for (let index = 0; index < bottomElements.length; index++) {
-      const element = bottomElements[index];      
+      const element = bottomElements[index];
 
       if (!element.classList.contains('m-mapheader')) {
-                
-        if (opened) {
-          
-          element.style.setProperty('margin-top',this.panelHeight + 10 +'px','important'); 
-          document.getElementById('div-contenedor').style.display='block';         
-          
-        } else {
-          element.style.setProperty('margin-top', 10 +'px','important');
-          document.getElementById('div-contenedor').style.display='none';
 
-          
+        if (opened) {
+
+          element.style.setProperty('margin-top', this.panelHeight + 10 + 'px', 'important');
+          document.getElementById('div-contenedor').style.display = 'block';
+
+        } else {
+          element.style.setProperty('margin-top', 10 + 'px', 'important');
+          document.getElementById('div-contenedor').style.display = 'none';
         }
       }
-     
     }
   }
 }
