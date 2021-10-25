@@ -46,11 +46,11 @@
   border: none !important;
 }
 
-.m-areas > div.m-area.m-top.m-right > div.m-panel.m-mapheader.collapsed >div#div-contenedor {
+.m-areas > div.m-area.m-top.m-right > div.m-panel.m-mapheader.collapsed > div.m-panel-controls >div#div-contenedor {
   display:none !important;
 }
 
-.m-areas > div.m-area.m-top.m-right > div.m-panel.m-mapheader.opened >div#div-contenedor {
+.m-areas > div.m-area.m-top.m-right > div.m-panel.m-mapheader.opened >div.m-panel-controls >div#div-contenedor {
   display:table !important;
 }
 
