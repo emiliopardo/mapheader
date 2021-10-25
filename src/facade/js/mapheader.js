@@ -25,6 +25,7 @@ export default class Mapheader extends M.Plugin {
      */
     this.map_ = null;
     this.config=config;
+    this.open = config.open
 
     /**
      * Array of controls
@@ -62,7 +63,9 @@ export default class Mapheader extends M.Plugin {
     });
     this.panel_.addControls(this.controls_);
     map.addPanels(this.panel_);
-    this.panel_.open();
+    if(this.open){
+      this.panel_.open();
+     }
   }
 
   /**
