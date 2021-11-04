@@ -146,7 +146,11 @@ export default class MapheaderControl extends M.Control {
     let bottomElements = document.querySelectorAll('div.m-top');
     if (document.querySelectorAll('div.m-panel.m-mapheader').length > 0) {
       this.panelHeight = document.querySelectorAll('div.m-panel.m-mapheader')[0].clientHeight;
-    } 
+      let button = document.querySelectorAll('div.m-panel.m-mapheader>button')[0];
+      if (button) {
+        button.style.setProperty('top', this.panelHeight + 'px', 'important');
+      }
+    }
     for (let index = 0; index < bottomElements.length; index++) {
       const element = bottomElements[index];
       if (element.classList.contains('m-left')) {
