@@ -53,4 +53,4 @@ Para comprobar el funcionamiento de este plugin se puede acceder al siguiente en
 
 ## Video Demo
 
-Para comprobar el funcionamiento de este plugin se puede descargar el [Video](https://github.com/emiliopardo/mapheader/blob/master/docs/video/mapHeader.webm?raw=true) el cual contempla la configuración y carga del plugin con diferentes cabeceras de páginas
+Para comprobar el funcionamiento de este plugin se puede descargar el [Video](./docs/video/mapHeader.webm?raw=true) el cual contempla la configuración y carga del plugin con diferentes cabeceras de páginas
